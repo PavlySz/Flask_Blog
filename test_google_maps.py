@@ -2,7 +2,7 @@ import googlemaps
 import os
 
 # Requires API key 
-gmaps = googlemaps.Client(key='AIzaSyA0UxBztBE0FGFdVDn-14uU5mcJUKUoRvg') 
+gmaps = googlemaps.Client(key='API_KEY_HERE') 
   
 # Requires cities name 
 my_dist = gmaps.distance_matrix('Cairo Governerate, Egypt','Alexandria Governerate, Egypt')['rows'][0]['elements'][0] 
