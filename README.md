@@ -14,7 +14,7 @@ Pavly Salah's submission for the Digizilla task using Flask.
     - Create user
     - Update user info
     - User authentication
-    - Reset password
+    - Reset password (and send verfication to user's email)
     - Upload profile picture (and save it locally)
 
 - TODO:
