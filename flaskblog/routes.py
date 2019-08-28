@@ -1,8 +1,10 @@
-from flask import render_template, url_for, flash, redirect, request    # url_for searches for a file in the directory
-from flaskblog import app, db, bcrypt                                   # To import from an __init__ file inside a package, use the package name directly
-from flaskblog.forms import RegistrationForm, LoginForm                 # Import all classes from the 'forms' file
+from flask import render_template, url_for, flash, redirect, request                # url_for searches for a file in the directory
+from flaskblog import app, db, bcrypt                                               # To import from an __init__ file inside a package, use the package name directly
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm          # Import all classes from the 'forms' file
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
+import os, secrets
+from PIL import Image
 
 
 # Posts in the blog. Note how it is written
@@ -96,8 +98,43 @@ def logout():
     return redirect(url_for('home'))
 
 
+def save_picture(form_picture):
+    random_hex_filename = secrets.token_hex(8)                      # Generate a random hex of length 8 for the file name
+    _, file_extension = os.path.splitext(form_picture.filename)     # split the filename into file_name (not needed) and file_extension
+    profile_pic_filename = random_hex_filename + file_extension     # the new filename is the randomly generated hex + the original file extension
+    profile_pic_path = os.path.join(app.root_path, 'static/profile_pics', profile_pic_filename)     # picture path is in the profile_pics directory
+
+    # Resize the image to 125x125 in order to prevent very large file from slowing the website down
+    img_output_size = (125, 125)
+    img = Image.open(form_picture)
+    img.thumbnail(img_output_size)
+    img.save(profile_pic_path)                             # Save the resized uploaded img in the profile_pic_path
+
+    return profile_pic_filename
+
+
 # Account page
-@app.route("/account")
+@app.route("/account", methods=['GET', 'POST'])
 @login_required     # Must be logged-in to access this page
 def account():
-    return render_template('account.html', title="Account")
+    form = UpdateAccountForm()
+
+    # If the user entered correct data, update his OR HER username and email
+    if form.validate_on_submit():
+        if form.profile_pic.data:
+            profile_pic_file = save_picture(form.profile_pic.data)
+            current_user.image_file = profile_pic_file
+
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash('Your account info has been updated!', 'success')
+        return redirect(url_for('account'))
+
+    # Have the form be already populated with the user's username and email
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+    
+    image_file = url_for('static', filename=f'profile_pics/{current_user.image_file}')  # Get the current user's image file name from the DB
+    return render_template('account.html', title="Account", image_file=image_file, form=form)
