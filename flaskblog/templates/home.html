@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}    <!--Our code block is in 'layoout.html'-->
+{% block content %}    <!--Start code block-->
+    <!--Loop over every post in 'posts' and display it-->
+    {% for post in posts %}
+        <article class="media content-section">
+            <div class="media-body">
+            <div class="article-metadata">
+                <a class="mr-2" href="#">{{ post.author }}</a>
+                <small class="text-muted">{{ post.date }}</small>
+            </div>
+            <h2><a class="article-title" href="#">{{ post.title }}</a></h2>
+            <p class="article-content">{{ post.content }}</p>
+            </div>
+        </article>
+    {% endfor %}
+{% endblock content %}    <!--End code block-->
+
+
+<!-- #------------------------------------------------------------------------# -->
+<!--
+<!DOCTYPE html>
+<html>
+    <head>
+        {% if title %}
+            <title>{{ title }}</title>
+        {% else %}
+            <title>Flask Blog - Home Page</title>
+        {% endif %}
+    </head>
+    <body>
+        Loop over every post in 'posts' and display it
+        {% for post in posts %}
+        <h1>{{ post.title }}</h1>
+        <h3>By {{ post.author }} on {{ post.date }}</h3>
+        <p>{{post.content }}</p>
+        {% endfor %}
+    </body>
+</html>
+-->
